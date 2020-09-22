@@ -56,7 +56,7 @@ nav h1 {
   background: var(--primaryColor);
   padding: 0 5px;
   border-radius: 30%;
-  color: var(--mainWhite);
+  color: green;
 }
 /* --------------- End of Navbar ---------------- */
 /* --------------- Hero ---------------- */

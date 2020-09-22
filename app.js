@@ -39,8 +39,6 @@ class Products {
 //display product
 class UI {
   DisplayProducts(products) {
-    //console.log(products);
-
     // adding the products to the htmlDom
     let result = "";
     products.forEach((product) => {
@@ -136,6 +134,23 @@ class UI {
     cartOverlay.classList.add("transparentBcg");
     cartDom.classList.add("showCart");
   }
+
+  hideCart() {
+    cartOverlay.classList.remove("transparentBcg");
+    cartDom.classList.remove("showCart");
+  }
+
+  // set up the cart even when the user has not added anything to the cart
+  SetupApp() {
+    cart = Storage.getCart();
+    this.setCartValue(cart);
+    this.populateCart(cart);
+    cartBtn.addEventListener("click", this.ShowCart);
+    closeBtn.addEventListener("click", this.hideCart);
+  }
+  populateCart(cart) {
+    cart.forEach((item) => this.AddCartItem(item));
+  }
 }
 
 //local  storage
@@ -151,12 +166,19 @@ class Storage {
   static SaveCart(cart) {
     localStorage.setItem("cart", JSON.stringify(cart));
   }
+  static getCart() {
+    return localStorage.getItem("cart")
+      ? JSON.parse(localStorage.setItem("cart"))
+      : [];
+  }
 }
 
 //event listener
 document.addEventListener("DOMContentLoaded", () => {
   let products = new Products();
   let ui = new UI();
+  //set up cart
+  ui.SetupApp();
 
   // get all products
   products
