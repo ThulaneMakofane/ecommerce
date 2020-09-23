@@ -245,7 +245,7 @@ nav h1 {
   text-align: center;
 }
 .remove-item {
-  color: grey;
+  color: lightcoral;
   cursor: pointer;
 }
 .fa-chevron-up,
