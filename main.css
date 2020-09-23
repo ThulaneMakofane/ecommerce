@@ -93,8 +93,8 @@ nav h1 {
   cursor: pointer;
 }
 .banner-btn:hover {
-  background: transparent;
-  color: var(--primaryColor);
+  background:  rgb(8, 92, 103);
+  color:var(--mainGrey);
 }
 /* --------------- End of Hero ---------------- */
 /* --------------- Products ---------------- */
