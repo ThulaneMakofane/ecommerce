@@ -1,7 +1,7 @@
 // variables
 
 const cartBtn = document.querySelector(".nav-icon");
-const closeBtn = document.querySelector(".close-btn");
+const closeBtn = document.querySelector(".close-cart");
 const clearCartBtn = document.querySelector(".clear-cart");
 const cartDom = document.querySelector(".cart");
 const cartItems = document.querySelector(".cart-items");
@@ -134,12 +134,10 @@ class UI {
     cartOverlay.classList.add("transparentBcg");
     cartDom.classList.add("showCart");
   }
-
   hideCart() {
     cartOverlay.classList.remove("transparentBcg");
     cartDom.classList.remove("showCart");
   }
-
   // set up the cart even when the user has not added anything to the cart
   SetupApp() {
     cart = Storage.getCart();
@@ -147,9 +145,35 @@ class UI {
     this.populateCart(cart);
     cartBtn.addEventListener("click", this.ShowCart);
     closeBtn.addEventListener("click", this.hideCart);
+
+    console.log(cartBtn, closeBtn);
   }
   populateCart(cart) {
     cart.forEach((item) => this.AddCartItem(item));
+  }
+  //clear cart button
+  CartLogic() {
+    clearCartBtn.addEventListener("click", () => {
+      this.clearCart();
+    });
+  }
+  clearcart() {
+    let cartItems = cart.map((item) => item.id);
+    cartItems.forEach((id) => this.removeItem(id));
+    while (cartContent.children.length > 0) {
+      cartContent.removeChild(cartContent.children[0]);
+    }
+  }
+  removeItem() {
+    cart = cart.filter((item) => item.id == id);
+    this.setCartValue(cart);
+    Storage.SaveCart(cart);
+    let button = this.getSinglebutton(id);
+    button.disabled = false;
+    button.innerText = `<i class"fas fa-shopping-cart></i> add to cart `;
+  }
+  getSinglebutton(id) {
+    return ButtonsDom.find((button) => button.dataset.id === id);
   }
 }
 
@@ -168,7 +192,7 @@ class Storage {
   }
   static getCart() {
     return localStorage.getItem("cart")
-      ? JSON.parse(localStorage.setItem("cart"))
+      ? JSON.parse(localStorage.getItem("cart"))
       : [];
   }
 }
@@ -189,5 +213,6 @@ document.addEventListener("DOMContentLoaded", () => {
     })
     .then(() => {
       ui.getBagButton();
+      ui.CartLogic();
     });
 });
