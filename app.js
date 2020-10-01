@@ -1,6 +1,13 @@
+const client = contentful.createClient({
+  // This is the space ID. A space is like a project folder in Contentful terms
+  space: "ha41tg64q695",
+  // This is the access token for this space. Normally you get both ID and the token in the Contentful web app
+  accessToken: "LWvMrEAq6P5f298_N62txux4jZdINhyYg1V3LoFB4DE",
+});
+
 // variables
 
-const cartBtn = document.querySelector(".nav-icon");
+const cartBtn = document.querySelector(".cart-btn");
 const closeBtn = document.querySelector(".close-cart");
 const clearCartBtn = document.querySelector(".clear-cart");
 const cartDom = document.querySelector(".cart");
@@ -9,19 +16,25 @@ const cartOverlay = document.querySelector(".cart-overlay");
 const cartTotal = document.querySelector(".cart-total");
 const cartContent = document.querySelector(".cart-content");
 const productsDom = document.querySelector(".products-center");
+const shopnow = document.querySelector(".banner-btn");
 
 // cart
 let cart = [];
 //buttons
 let ButtonsDom = [];
 //getting the products
+
 class Products {
   async getProducts() {
     try {
-      let result = await fetch("products.json");
-      let data = await result.json();
-      let products = data.items;
-      //getting simple data items  by decrementing it from products.json file
+      let contentful = await client.getEntries({
+        content_type: "ecommerce",
+      });
+
+      // let result = await fetch("products.json");
+      // let data = await result.json();
+      let products = contentful.items;
+      //getting simple data items  by decrementing it from the cms
       products = products.map((item) => {
         const { title, price } = item.fields;
         const { id } = item.sys;
@@ -37,6 +50,7 @@ class Products {
 }
 
 //display product
+
 class UI {
   DisplayProducts(products) {
     // adding the products to the htmlDom
@@ -67,6 +81,7 @@ class UI {
     });
     productsDom.innerHTML = result;
   }
+
   getBagButton() {
     const buttons = [...document.querySelectorAll(".bag-btn")];
     ButtonsDom = buttons;
@@ -87,7 +102,7 @@ class UI {
 
         // add product to the cart
         cart = [...cart, cartItem];
-        console.log(cart);
+
         // save cart in local  storage
         Storage.SaveCart(cart);
         // get cart value
@@ -99,6 +114,7 @@ class UI {
       });
     });
   }
+
   setCartValue(cart) {
     let tempTotal = 0;
     let itemTotal = 0;
@@ -108,7 +124,6 @@ class UI {
     });
     cartTotal.innerText = parseFloat(tempTotal.toFixed(2));
     cartItems.innerText = itemTotal;
-
   }
 
   AddCartItem(item) {
@@ -128,12 +143,16 @@ class UI {
             <i class="fas fa-chevron-down"data-id= ${item.id}></i>
           </div>`;
     cartContent.appendChild(div);
-    console.log(cartContent);
   }
   ShowCart() {
     cartOverlay.classList.add("transparentBcg");
     cartDom.classList.add("showCart");
   }
+
+  showContent() {
+    document.querySelector(".products - center");
+  }
+
   hideCart() {
     cartOverlay.classList.remove("transparentBcg");
     cartDom.classList.remove("showCart");
@@ -145,8 +164,6 @@ class UI {
     this.populateCart(cart);
     cartBtn.addEventListener("click", this.ShowCart);
     closeBtn.addEventListener("click", this.hideCart);
-
-
   }
   populateCart(cart) {
     cart.forEach((item) => this.AddCartItem(item));
@@ -157,60 +174,50 @@ class UI {
       this.clearcart();
     });
     // cart functionality
-    cartContent.addEventListener('click', event => {
-      if (event.target.classList.contains('remove-item')) {
+    cartContent.addEventListener("click", (event) => {
+      if (event.target.classList.contains("remove-item")) {
         let removeItem = event.target;
         let id = removeItem.dataset.id;
         cartContent.removeChild(removeItem.parentElement.parentElement);
-
         this.removeItem(id);
-      }
-      else if (event.target.classList.contains("fa-chevron-up")) {
+      } else if (event.target.classList.contains("fa-chevron-up")) {
         let addamount = event.target;
         let id = addamount.dataset.id;
-        let tempitem = cart.find(item => item.id === id);
+        let tempitem = cart.find((item) => item.id === id);
         tempitem.amount = tempitem.amount + 1;
         Storage.SaveCart(cart);
         this.setCartValue(cart);
         addamount.nextElementSibling.innerText = tempitem.amount;
-
-
       } else if (event.target.classList.contains("fa-chevron-down")) {
         let loweramount = event.target;
         let id = loweramount.dataset.id;
-        let tempitem = cart.find(item => item.id === id);
+        let tempitem = cart.find((item) => item.id === id);
         tempitem.amount = tempitem.amount - 1;
-        if (tempitem > 0) {
+        Storage.SaveCart(cart);
+        if (tempitem.amount > 0) {
           Storage.SaveCart(cart);
           this.setCartValue(cart);
-          loweramount.previousElementSiblinng.innerText = tempitem.amount;
+          loweramount.previousElementSibling.innerText = tempitem.amount;
         } else {
           cartContent.removeChild(loweramount.parentElement.parentElement);
           this.removeItem(id);
         }
-
-
-
       }
-
-
-    })
+    });
   }
-
-
 
   clearcart() {
     let cartItems = cart.map((item) => item.id);
     cartItems.forEach((id) => this.removeItem(id));
+
     while (cartContent.children.length > 0) {
       cartContent.removeChild(cartContent.children[0]);
-
     }
     this.hideCart();
   }
   removeItem(id) {
     cart = cart.filter((item) => item.id == id);
-    this.setCartValue(cart);
+    // this.setCartValue(cart);
     Storage.SaveCart(cart);
     let button = this.getSinglebutton(id);
     button.disabled = false;
@@ -240,7 +247,8 @@ class Storage {
       : [];
   }
 }
-
+const homebutton = shopnow;
+homebutton.addEventListener("click", (event) => {});
 //event listener
 document.addEventListener("DOMContentLoaded", () => {
   let products = new Products();
